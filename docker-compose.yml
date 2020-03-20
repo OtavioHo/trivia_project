@@ -1,0 +1,50 @@
+version: '3.7'
+
+services:
+  db:
+    container_name: postgres
+    image: postgres:9.4
+    volumes:
+      - ./backend/init.sh:/docker-entrypoint-initdb.d/init.sh
+      - ./backend/trivia.psql:/docker-entrypoint-initdb.d/trivia.psql
+    ports: 
+      - '5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=trivia
+
+  flask:
+    container_name: flask
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on: 
+      - db
+    volumes: 
+      - './backend:/app'
+    ports: 
+      - '5000:5000'
+    environment: 
+      - FLASK_APP=flaskr
+      - FLASK_ENV=development
+      - LC_ALL=C.UTF-8
+      - LANG=C.UTF-8
+    links: 
+      - "db:localhost"
+
+
+  react:
+    container_name: react
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - './frontend:/app'
+      - '/app/node_modules'
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+    links: 
+      - 'flask:localhost'
