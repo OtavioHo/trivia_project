@@ -256,7 +256,7 @@ POST '/questions' (add)
 
 ```
 
-POST '/questions' (search)
+POST '/search'
 
 - General:
   Searches matching questions for a given search phrase, case insensitive
